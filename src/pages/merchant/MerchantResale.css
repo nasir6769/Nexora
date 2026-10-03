@@ -1,0 +1,244 @@
+.merchant-resale {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+
+.merchant-resale .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.merchant-resale .page-header h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.merchant-resale .page-header p {
+  margin: 6px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-header-actions a {
+  text-decoration: none;
+}
+
+/* Error */
+
+.resale-error {
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+
+  background: var(--danger-light);
+  color: var(--danger);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Filters */
+
+.resale-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resale-category-select {
+  min-width: 150px;
+  height: 38px;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+
+  font-family: inherit;
+  font-size: 12px;
+
+  outline: none;
+  cursor: pointer;
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.resale-category-select:focus {
+  border-color: var(--primary);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(37, 99, 235, 0.1);
+}
+
+/* Table */
+
+.resale-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.resale-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 12px;
+}
+
+.resale-table th {
+  padding: 13px 18px;
+
+  border-bottom: 1px solid var(--border);
+
+  background: var(--bg-primary);
+  color: var(--text-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: left;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.resale-table td {
+  padding: 15px 18px;
+
+  border-bottom: 1px solid var(--border-light);
+
+  color: var(--text-secondary);
+
+  vertical-align: middle;
+}
+
+.resale-table tbody tr {
+  transition:
+    background var(--transition-fast);
+}
+
+.resale-table tbody tr:hover {
+  background: var(--bg-primary);
+}
+
+.resale-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.resale-table td strong {
+  display: block;
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.resale-sku {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--text-light);
+
+  font-size: 10px;
+}
+
+.resale-table td a {
+  text-decoration: none;
+}
+
+/* Loading */
+
+.resale-loading {
+  min-height: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.resale-loading p {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .merchant-resale .page-header {
+    flex-direction: column;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions a {
+    flex: 1;
+  }
+
+  .page-header-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .merchant-resale {
+    gap: 18px;
+  }
+
+  .resale-filters {
+    width: 100%;
+
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resale-filters > * {
+    width: 100%;
+  }
+
+  .resale-category-select {
+    width: 100%;
+  }
+
+  .page-header-actions {
+    flex-direction: column;
+  }
+
+  .page-header-actions a {
+    width: 100%;
+  }
+}

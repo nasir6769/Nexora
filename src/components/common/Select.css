@@ -1,0 +1,123 @@
+.select-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.select-field-full-width {
+  width: 100%;
+}
+
+.select-label {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.select-required {
+  margin-left: 3px;
+  color: var(--danger);
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-control {
+  width: 100%;
+  min-height: 42px;
+
+  padding: 0 38px 0 12px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  outline: none;
+
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+
+  cursor: pointer;
+
+  appearance: none;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--text-muted) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--text-muted) 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 17px) 18px,
+    calc(100% - 12px) 18px;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.select-control:hover:not(:disabled) {
+  border-color: #cbd5e1;
+}
+
+.select-control:focus {
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.select-control:disabled {
+  background-color: var(--bg-primary);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.select-field-error .select-control {
+  border-color: var(--danger);
+}
+
+.select-field-error .select-control:focus {
+  box-shadow: 0 0 0 3px var(--danger-light);
+}
+
+.select-hint,
+.select-error {
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.select-hint {
+  color: var(--text-muted);
+}
+
+.select-error {
+  color: var(--danger);
+}
+
+@media (max-width: 500px) {
+  .select-control {
+    min-height: 44px;
+  }
+}
