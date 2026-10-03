@@ -1,3 +1,6 @@
+// TEMPORARY DEMO DATA
+// Used only for frontend development and UI testing.
+// Replace with real backend/API data before production.
 export const demoInventory = [
   {
     id: "inv-001",
