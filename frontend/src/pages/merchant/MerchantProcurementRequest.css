@@ -1,0 +1,320 @@
+.procurement-request {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+
+.procurement-request .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.procurement-request .page-header h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.procurement-request .page-header p {
+  margin: 6px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.procurement-request .page-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Error */
+
+.procurement-request-error {
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+
+  background: var(--danger-light);
+  color: var(--danger);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Main */
+
+.procurement-request-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(280px, 0.9fr)
+    minmax(360px, 1.1fr);
+
+  gap: 20px;
+}
+
+/* Product summary */
+
+.product-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid var(--border-light);
+}
+
+.product-summary-row:first-child {
+  padding-top: 0;
+}
+
+.product-summary-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.product-summary-row span {
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.product-summary-row strong {
+  max-width: 220px;
+
+  overflow: hidden;
+
+  color: var(--text-primary);
+
+  font-size: 13px;
+  font-weight: 650;
+
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Form */
+
+.procurement-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.commitment-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  padding: 16px;
+
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+
+  background: var(--warning-light);
+}
+
+.commitment-box > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.commitment-box strong {
+  color: var(--text-primary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.commitment-box p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.commitment-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.commitment-check input {
+  width: 15px;
+  height: 15px;
+
+  margin: 0;
+
+  flex-shrink: 0;
+
+  accent-color: var(--primary);
+}
+
+/* Actions */
+
+.procurement-request-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid var(--border-light);
+}
+
+.procurement-request-actions button {
+  min-width: 125px;
+}
+
+/* Success */
+
+.procurement-success {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  text-align: center;
+}
+
+.procurement-success-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 50%;
+
+  background: var(--success-light);
+  color: var(--success);
+
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.procurement-success h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.procurement-success p {
+  max-width: 500px;
+
+  margin: 8px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.procurement-success p strong {
+  color: var(--text-primary);
+}
+
+.procurement-success-actions {
+  display: flex;
+  gap: 10px;
+
+  margin-top: 24px;
+}
+
+/* Loading */
+
+.procurement-request-loading {
+  min-height: 360px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.procurement-request-loading p {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+}
+
+/* Responsive */
+
+@media (max-width: 800px) {
+  .procurement-request-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .procurement-request {
+    gap: 18px;
+  }
+
+  .procurement-request .page-header {
+    flex-direction: column;
+  }
+
+  .procurement-request .page-header a {
+    width: 100%;
+  }
+
+  .procurement-request .page-header button {
+    width: 100%;
+  }
+
+  .procurement-request-actions,
+  .procurement-success-actions {
+    flex-direction: column-reverse;
+  }
+
+  .procurement-request-actions button,
+  .procurement-success-actions button {
+    width: 100%;
+  }
+
+  .product-summary-row {
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,255 @@
+.merchant-resale-request {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.merchant-resale-request .page-header h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.merchant-resale-request .page-header p {
+  margin: 6px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Error */
+
+.resale-request-error {
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+
+  background: var(--danger-light);
+  color: var(--danger);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Main layout */
+
+.resale-request-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(280px, 0.9fr)
+    minmax(320px, 1.1fr);
+
+  gap: 20px;
+}
+
+/* Listing summary */
+
+.resale-listing-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.resale-listing-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid var(--border-light);
+}
+
+.resale-listing-summary > div:first-child {
+  padding-top: 0;
+}
+
+.resale-listing-summary > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.resale-listing-summary span {
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.resale-listing-summary strong {
+  color: var(--text-primary);
+
+  font-size: 13px;
+  font-weight: 650;
+
+  text-align: right;
+}
+
+/* Form */
+
+.resale-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.resale-request-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 15px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  background: var(--bg-primary);
+}
+
+.resale-request-total span {
+  color: var(--text-muted);
+
+  font-size: 12px;
+}
+
+.resale-request-total strong {
+  color: var(--text-primary);
+
+  font-size: 17px;
+  font-weight: 750;
+}
+
+/* Actions */
+
+.resale-request-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid var(--border-light);
+}
+
+.resale-request-actions button {
+  min-width: 130px;
+}
+
+/* Success */
+
+.resale-request-success {
+  min-height: 320px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  text-align: center;
+}
+
+.resale-request-success-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 50%;
+
+  background: var(--success-light);
+  color: var(--success);
+
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.resale-request-success h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.resale-request-success p {
+  max-width: 500px;
+
+  margin: 8px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.resale-request-success p strong {
+  color: var(--text-primary);
+}
+
+.resale-request-success-actions {
+  display: flex;
+  gap: 10px;
+
+  margin-top: 24px;
+}
+
+/* Loading */
+
+.resale-request-loading {
+  min-height: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.resale-request-loading p {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+}
+
+/* Responsive */
+
+@media (max-width: 800px) {
+  .resale-request-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .merchant-resale-request {
+    gap: 18px;
+  }
+
+  .resale-listing-summary > div {
+    align-items: flex-start;
+  }
+
+  .resale-request-actions,
+  .resale-request-success-actions {
+    flex-direction: column-reverse;
+  }
+
+  .resale-request-actions button,
+  .resale-request-success-actions button {
+    width: 100%;
+  }
+}

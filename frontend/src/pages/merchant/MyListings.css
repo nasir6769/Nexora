@@ -1,0 +1,197 @@
+.my-listings {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+
+.my-listings .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.my-listings .page-header h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.my-listings .page-header p {
+  margin: 6px 0 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.my-listings .page-header a {
+  text-decoration: none;
+}
+
+/* Error */
+
+.my-listings-error {
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+
+  background: var(--danger-light);
+  color: var(--danger);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Search */
+
+.my-listings .card-actions {
+  min-width: 240px;
+}
+
+/* Table */
+
+.my-listings-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.my-listings-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 12px;
+}
+
+.my-listings-table th {
+  padding: 13px 18px;
+
+  border-bottom: 1px solid var(--border);
+
+  background: var(--bg-primary);
+  color: var(--text-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: left;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.my-listings-table td {
+  padding: 15px 18px;
+
+  border-bottom: 1px solid var(--border-light);
+
+  color: var(--text-secondary);
+
+  vertical-align: middle;
+}
+
+.my-listings-table tbody tr {
+  transition:
+    background var(--transition-fast);
+}
+
+.my-listings-table tbody tr:hover {
+  background: var(--bg-primary);
+}
+
+.my-listings-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.my-listings-table td strong {
+  display: block;
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.listing-sku {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--text-light);
+
+  font-size: 10px;
+}
+
+/* Actions */
+
+.listing-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listing-actions button {
+  white-space: nowrap;
+}
+
+/* Loading */
+
+.my-listings-loading {
+  min-height: 400px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.my-listings-loading p {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 13px;
+}
+
+/* Responsive */
+
+@media (max-width: 800px) {
+  .my-listings .page-header {
+    flex-direction: column;
+  }
+
+  .my-listings .page-header a {
+    width: 100%;
+  }
+
+  .my-listings .page-header button {
+    width: 100%;
+  }
+
+  .my-listings .card-actions {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 550px) {
+  .my-listings {
+    gap: 18px;
+  }
+
+  .my-listings-table th,
+  .my-listings-table td {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+}
