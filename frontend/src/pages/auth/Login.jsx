@@ -11,7 +11,7 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { login, demoLogin } = useAuth();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -110,7 +110,7 @@ function Login() {
       <div className="auth-card">
         <div className="auth-header">
           <h1>Welcome back</h1>
-          <p>Sign in to your merchant network account.</p>
+          <p>Sign in to your Nexora account.</p>
         </div>
 
         {error && (
@@ -153,47 +153,7 @@ function Login() {
           <span>or</span>
         </div>
 
-        <div className="demo-section">
-          <div className="demo-heading">
-            <strong>Preview the frontend</strong>
-            <span>Backend not required</span>
-          </div>
-
-          <div className="demo-buttons">
-            <Button
-              type="button"
-              variant="secondary"
-              fullWidth
-              loading={demoLoading === "merchant"}
-              disabled={Boolean(demoLoading)}
-              onClick={() => handleDemoLogin("merchant")}
-            >
-              Preview as Merchant
-            </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              fullWidth
-              loading={demoLoading === "supplier"}
-              disabled={Boolean(demoLoading)}
-              onClick={() => handleDemoLogin("supplier")}
-            >
-              Preview as Supplier
-            </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              fullWidth
-              loading={demoLoading === "admin"}
-              disabled={Boolean(demoLoading)}
-              onClick={() => handleDemoLogin("admin")}
-            >
-              Preview as Admin
-            </Button>
-          </div>
-        </div>
+       
 
         <div className="auth-footer">
           <span>Don't have an account?</span>{" "}

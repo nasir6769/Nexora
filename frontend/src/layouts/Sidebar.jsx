@@ -156,7 +156,7 @@ function Sidebar() {
 
         <div>
           <div className="sidebar-brand-name">
-            Merchant Network
+            Nexora
           </div>
 
           <div className="sidebar-brand-subtitle">

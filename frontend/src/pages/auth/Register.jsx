@@ -115,7 +115,7 @@ function Register() {
         <h1>Create your account</h1>
 
         <p>
-          Join the Merchant Network and choose your
+          Join the Nexora and choose your
           workspace.
         </p>
       </div>

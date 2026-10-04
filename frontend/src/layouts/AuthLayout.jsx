@@ -11,7 +11,7 @@ function AuthLayout() {
         </div>
 
         <div className="auth-layout-brand-text">
-          <strong>Merchant Network</strong>
+          <strong>Nexora</strong>
           <span>B2B Commerce Platform</span>
         </div>
       </div>
@@ -22,7 +22,7 @@ function AuthLayout() {
 
       <footer className="auth-layout-footer">
         <span>
-          Merchant Network
+          Nexora
         </span>
 
         <span>

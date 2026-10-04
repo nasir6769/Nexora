@@ -54,7 +54,7 @@ function Header() {
           </span>
 
           <span className="header-brand-name">
-            Merchant Network
+            Nexora
           </span>
         </div>
       </div>
