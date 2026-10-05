@@ -270,3 +270,15 @@ export const createSupplierOrder = async (data) => {
 
   return response.data;
 };
+
+export const allocateDemand = async (data) => {
+  if (isDemoMode()) {
+    return {
+      success: true,
+      message: "Demand allocated successfully",
+    };
+  }
+
+  const response = await api.post("/admin/procurement/allocate", data);
+  return response.data;
+};

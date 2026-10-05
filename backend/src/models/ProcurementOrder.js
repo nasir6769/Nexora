@@ -112,6 +112,17 @@ const procurementOrderSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    parentRequestId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    coveredRequestIds: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     trackingNumber: {
       type: String,
       trim: true,

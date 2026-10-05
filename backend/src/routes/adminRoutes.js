@@ -20,6 +20,7 @@ router.get("/orders/:id", adminController.getOrderDetail);
 router.get("/procurement", adminController.getProcurement);
 router.get("/procurement/supplier-offers", adminController.getSupplierOffers);
 router.post("/procurement/supplier-order", adminController.createSupplierOrder);
+router.post("/procurement/allocate", adminController.allocateDemand);
 router.get("/procurement/:id", adminController.getProcurementDetail);
 
 router.get("/logistics", adminController.getLogistics);

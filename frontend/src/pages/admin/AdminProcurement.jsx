@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import {
   createSupplierOrder,
+  allocateDemand,
   getAdminProcurement,
   getSupplierOffers,
 } from "../../services/adminService";
@@ -53,6 +54,7 @@ function getStatusVariant(status) {
       "completed",
       "delivered",
       "accepted",
+      "supplier accepted",
       "approved",
       "ordered",
     ].includes(normalized)
@@ -63,6 +65,7 @@ function getStatusVariant(status) {
   if (
     [
       "rejected",
+      "supplier rejected",
       "cancelled",
       "canceled",
       "failed",
@@ -113,68 +116,98 @@ function AdminProcurement() {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [selectedRequest, setSelectedRequest] = useState(null);
- const [selectedSupplier, setSelectedSupplier] = useState(null);
-const [supplierOffers, setSupplierOffers] = useState([]);
-const [isLoadingOffers, setIsLoadingOffers] = useState(false);
-const [orderQuantity, setOrderQuantity] = useState(0);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [supplierOffers, setSupplierOffers] = useState([]);
+  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
+  const [orderQuantity, setOrderQuantity] = useState(0);
+
+  const [allocations, setAllocations] = useState({});
+  const [allocatingError, setAllocatingError] = useState("");
+  const [isAllocating, setIsAllocating] = useState(false);
 
   const [orderCreated, setOrderCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const loadProcurement = async () => {
-      setIsLoading(true);
-      setError("");
-
-      try {
-        const response = await getAdminProcurement();
-
-        setRequests(getArray(response));
-      } catch (requestError) {
-        setError(
-          requestError?.response?.data?.message ||
-            requestError?.response?.data?.error ||
-            requestError?.message ||
-            "Unable to load procurement requests."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProcurement();
-  }, []);
-
-useEffect(() => {
-  if (!selectedRequest) {
-    return;
-  }
-
-  const loadSupplierOffers = async () => {
-    setIsLoadingOffers(true);
+  const loadProcurementData = async () => {
+    setIsLoading(true);
+    setError("");
 
     try {
-      const productName =
-        selectedRequest?.productName ||
-        selectedRequest?.product?.name;
-
-      const offers = await getSupplierOffers(productName);
-
-      setSupplierOffers(
-        Array.isArray(offers)
-          ? offers
-          : offers?.data || offers?.items || []
+      const response = await getAdminProcurement();
+      setRequests(getArray(response));
+    } catch (requestError) {
+      setError(
+        requestError?.response?.data?.message ||
+          requestError?.response?.data?.error ||
+          requestError?.message ||
+          "Unable to load procurement requests."
       );
-    } catch {
-      setSupplierOffers([]);
     } finally {
-      setIsLoadingOffers(false);
+      setIsLoading(false);
     }
   };
 
-  loadSupplierOffers();
-}, [selectedRequest]);
+  useEffect(() => {
+    loadProcurementData();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedRequest) {
+      return;
+    }
+
+    const loadOffers = async () => {
+      setIsLoadingOffers(true);
+      setAllocations({});
+      setAllocatingError("");
+
+      try {
+        const productName =
+          selectedRequest?.productName ||
+          selectedRequest?.product?.name;
+
+        const offers = await getSupplierOffers(productName);
+        const resolvedOffers = Array.isArray(offers)
+          ? offers
+          : offers?.data || offers?.items || [];
+
+        setSupplierOffers(resolvedOffers);
+
+        // Compute total demand for this product
+        const sameProductRequests = requests.filter(
+          (r) =>
+            (r?.productName || r?.product?.name || "").toLowerCase() ===
+              (productName || "").toLowerCase() &&
+            ["pending", "requested", "commitment_paid", "aggregated"].includes(
+              getStatus(r)
+            )
+        );
+
+        const totalDemand =
+          sameProductRequests.length > 0
+            ? sameProductRequests.reduce(
+                (sum, r) => sum + Number(r.quantity || 1),
+                0
+              )
+            : Number(selectedRequest?.quantity || 1);
+
+        // Pre-fill allocation for top supplier if single request/demand
+        if (resolvedOffers.length > 0) {
+          setAllocations({
+            [resolvedOffers[0].id]: totalDemand,
+          });
+        }
+      } catch {
+        setSupplierOffers([]);
+      } finally {
+        setIsLoadingOffers(false);
+      }
+    };
+
+    loadOffers();
+  }, [selectedRequest]);
+
   const filteredRequests = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -209,8 +242,6 @@ useEffect(() => {
     });
   }, [requests, search, statusFilter]);
 
-  
-
   const totalOrderValue =
     Number(orderQuantity || 0) *
     Number(selectedSupplier?.price || 0);
@@ -219,6 +250,7 @@ useEffect(() => {
     setSelectedRequest(request);
     setSelectedSupplier(null);
     setOrderCreated(false);
+    setAllocatingError("");
 
     const quantity =
       Number(
@@ -235,6 +267,8 @@ useEffect(() => {
     setSelectedSupplier(null);
     setOrderQuantity(0);
     setOrderCreated(false);
+    setAllocations({});
+    setAllocatingError("");
   };
 
   const handleSupplierSelect = (supplier) => {
@@ -255,73 +289,137 @@ useEffect(() => {
     );
   };
 
+  const handleAllocationChange = (supplierId, value) => {
+    setAllocatingError("");
+    setAllocations((prev) => ({
+      ...prev,
+      [supplierId]: Number(value || 0),
+    }));
+  };
+
+  const handleConfirmAllocation = async () => {
+    setAllocatingError("");
+    setError("");
+
+    const productName =
+      selectedRequest?.productName || selectedRequest?.product?.name;
+
+    const sameProductRequests = requests.filter(
+      (r) =>
+        (r?.productName || r?.product?.name || "").toLowerCase() ===
+          (productName || "").toLowerCase() &&
+        ["pending", "requested", "commitment_paid", "aggregated"].includes(
+          getStatus(r)
+        )
+    );
+
+    const requestIds =
+      sameProductRequests.length > 0
+        ? sameProductRequests.map((r) => getId(r))
+        : [getId(selectedRequest)];
+
+    const totalDemand =
+      sameProductRequests.length > 0
+        ? sameProductRequests.reduce(
+            (sum, r) => sum + Number(r.quantity || 1),
+            0
+          )
+        : Number(selectedRequest?.quantity || 1);
+
+    const allocationList = supplierOffers
+      .map((s) => ({
+        supplierId: s.supplierId || s.id,
+        supplierName: s.supplierName,
+        unitPrice: Number(s.price || 0),
+        quantity: Number(allocations[s.id] || 0),
+      }))
+      .filter((a) => a.quantity > 0);
+
+    const totalAllocated = allocationList.reduce(
+      (sum, a) => sum + a.quantity,
+      0
+    );
+
+    if (totalAllocated !== totalDemand) {
+      setAllocatingError(
+        "Supplier allocation must equal total requested quantity."
+      );
+      return;
+    }
+
+    try {
+      setIsAllocating(true);
+      await allocateDemand({
+        productName,
+        requestIds,
+        allocations: allocationList,
+      });
+
+      setOrderCreated(true);
+      const response = await getAdminProcurement();
+      setRequests(getArray(response));
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Unable to allocate demand. Please try again.";
+      setAllocatingError(msg);
+    } finally {
+      setIsAllocating(false);
+    }
+  };
+
   const handleCreateSupplierOrder = async () => {
-  if (!selectedRequest || !selectedSupplier) {
-    return;
-  }
+    if (!selectedRequest || !selectedSupplier) {
+      return;
+    }
 
-  if (
-    orderQuantity < selectedSupplier.minimumOrderQuantity
-  ) {
-    return;
-  }
+    if (
+      orderQuantity < selectedSupplier.minimumOrderQuantity
+    ) {
+      return;
+    }
 
-  if (
-    orderQuantity > selectedSupplier.availableStock
-  ) {
-    return;
-  }
+    if (
+      orderQuantity > selectedSupplier.availableStock
+    ) {
+      return;
+    }
 
-  try {
-    await createSupplierOrder({
-      requestId: getId(selectedRequest),
+    try {
+      await createSupplierOrder({
+        requestId: getId(selectedRequest),
 
-      productId:
-        selectedRequest?.productId ||
-        selectedRequest?.product?.id,
+        productId:
+          selectedRequest?.productId ||
+          selectedRequest?.product?.id,
 
-      productName:
-        selectedRequest?.productName ||
-        selectedRequest?.product?.name,
+        productName:
+          selectedRequest?.productName ||
+          selectedRequest?.product?.name,
 
-      supplierId: selectedSupplier.id,
+        supplierId: selectedSupplier.id,
 
-      supplierName:
-        selectedSupplier.supplierName,
+        supplierName:
+          selectedSupplier.supplierName,
 
-      quantity: orderQuantity,
+        quantity: orderQuantity,
 
-      unitPrice: selectedSupplier.price,
+        unitPrice: selectedSupplier.price,
 
-      totalAmount: totalOrderValue,
-    });
+        totalAmount: totalOrderValue,
+      });
 
-    setRequests((currentRequests) =>
-      currentRequests.map((request) =>
-        getId(request) === getId(selectedRequest)
-          ? {
-              ...request,
-              status: "ordered",
-              supplierName:
-                selectedSupplier.supplierName,
-              supplier: {
-                name:
-                  selectedSupplier.supplierName,
-              },
-              orderedQuantity: orderQuantity,
-              totalAmount: totalOrderValue,
-            }
-          : request
-      )
-    );
-
-    setOrderCreated(true);
-  } catch {
-    setError(
-      "Unable to create the supplier order. Please try again."
-    );
-  }
-};
+      setOrderCreated(true);
+      const response = await getAdminProcurement();
+      setRequests(getArray(response));
+    } catch {
+      setError(
+        "Unable to create the supplier order. Please try again."
+      );
+    }
+  };
 
   const getMerchantName = (request) =>
     request?.merchantName ||
@@ -595,256 +693,132 @@ useEffect(() => {
             </Button>
           </div>
 
-          <div className="procurement-request-summary">
-            <div>
-              <span>Request</span>
-              <strong>
-                #{getId(selectedRequest)}
-              </strong>
-            </div>
+          {(() => {
+            const productName = selectedRequest?.productName || selectedRequest?.product?.name || "Product";
+            const sameProductRequests = requests.filter(
+              (r) =>
+                (r?.productName || r?.product?.name || "").toLowerCase() === (productName || "").toLowerCase() &&
+                ["pending", "requested", "commitment_paid", "aggregated"].includes(getStatus(r))
+            );
+            const totalDemand = sameProductRequests.length > 0
+              ? sameProductRequests.reduce((sum, r) => sum + Number(r.quantity || 1), 0)
+              : Number(selectedRequest?.quantity || 1);
 
-            <div>
-              <span>Merchant</span>
-              <strong>
-                {getMerchantName(
-                  selectedRequest
-                )}
-              </strong>
-            </div>
+            const totalAllocated = Object.values(allocations).reduce((sum, qty) => sum + Number(qty || 0), 0);
 
-            <div>
-              <span>Product</span>
-              <strong>
-                {selectedRequest?.productName ||
-                  selectedRequest?.product?.name ||
-                  "—"}
-              </strong>
-            </div>
-
-            <div>
-              <span>Requested quantity</span>
-              <strong>
-                {selectedRequest?.quantity ??
-                  selectedRequest?.requestedQuantity ??
-                  "—"}
-              </strong>
-            </div>
-          </div>
-
-          {isLoadingOffers ? (
-  <div className="admin-procurement-loading">
-    <Spinner size="large" />
-
-    <p>
-      Loading supplier offers...
-    </p>
-  </div>
-) : supplierOffers.length === 0 ? (
-            <EmptyState
-              title="No supplier offers"
-              description="There are currently no supplier offers available for this product."
-            />
-          ) : (
-            <>
-              <div className="supplier-comparison">
-                {supplierOffers.map(
-                  (supplier) => {
-                    const isSelected =
-                      selectedSupplier?.id ===
-                      supplier.id;
-
-                    return (
-                      <div
-                        key={supplier.id}
-                        className={`supplier-offer ${
-                          isSelected
-                            ? "supplier-offer-selected"
-                            : ""
-                        }`}
-                      >
-                        <div className="supplier-offer-top">
-                          <div>
-                            <h3>
-                              {
-                                supplier.supplierName
-                              }
-                            </h3>
-
-                            <span>
-                              ★{" "}
-                              {supplier.rating}
-                            </span>
-                          </div>
-
-                          <strong>
-                            {formatCurrency(
-                              supplier.price
-                            )}
-                            <small>
-                              / unit
-                            </small>
-                          </strong>
-                        </div>
-
-                        <div className="supplier-offer-details">
-                          <div>
-                            <span>
-                              Available
-                            </span>
-                            <strong>
-                              {
-                                supplier.availableStock
-                              }
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Minimum order
-                            </span>
-                            <strong>
-                              {
-                                supplier.minimumOrderQuantity
-                              }
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Delivery
-                            </span>
-                            <strong>
-                              {
-                                supplier.deliveryDays
-                              }{" "}
-                              days
-                            </strong>
-                          </div>
-                        </div>
-
-                        <Button
-                          fullWidth
-                          variant={
-                            isSelected
-                              ? "primary"
-                              : "secondary"
-                          }
-                          onClick={() =>
-                            handleSupplierSelect(
-                              supplier
-                            )
-                          }
-                        >
-                          {isSelected
-                            ? "Supplier Selected"
-                            : "Select Supplier"}
-                        </Button>
-                      </div>
-                    );
-                  }
-                )}
-              </div>
-
-              {selectedSupplier && (
-                <div className="supplier-order-panel">
+            return (
+              <>
+                <div className="procurement-request-summary">
                   <div>
-                    <span className="supplier-order-label">
-                      Selected supplier
-                    </span>
-
-                    <strong>
-                      {
-                        selectedSupplier.supplierName
-                      }
+                    <span>Product</span>
+                    <strong>{productName}</strong>
+                  </div>
+                  <div>
+                    <span>Total Demand</span>
+                    <strong>{totalDemand} units</strong>
+                  </div>
+                  <div>
+                    <span>Merchant Requests ({sameProductRequests.length || 1})</span>
+                    <strong style={{ fontSize: "0.85rem" }}>
+                      {sameProductRequests.length > 0
+                        ? sameProductRequests.map((r) => `${getMerchantName(r)} (${r.quantity} units)`).join(", ")
+                        : `${getMerchantName(selectedRequest)} (${selectedRequest?.quantity || 1} units)`}
                     </strong>
                   </div>
-
-                  <div className="supplier-order-field">
-                    <label htmlFor="order-quantity">
-                      Order quantity
-                    </label>
-
-                    <input
-                      id="order-quantity"
-                      type="number"
-                      min={
-                        selectedSupplier.minimumOrderQuantity
-                      }
-                      max={
-                        selectedSupplier.availableStock
-                      }
-                      value={orderQuantity}
-                      onChange={(event) =>
-                        setOrderQuantity(
-                          Number(
-                            event.target.value
-                          )
-                        )
-                      }
-                    />
-
-                    <small>
-                      MOQ:{" "}
-                      {
-                        selectedSupplier.minimumOrderQuantity
-                      }{" "}
-                      · Available:{" "}
-                      {
-                        selectedSupplier.availableStock
-                      }
-                    </small>
-                  </div>
-
-                  <div className="supplier-order-total">
-                    <span>Order value</span>
-
-                    <strong>
-                      {formatCurrency(
-                        totalOrderValue
-                      )}
-                    </strong>
-                  </div>
-
-                  <Button
-                    size="large"
-                    disabled={
-                      orderQuantity <
-                        selectedSupplier.minimumOrderQuantity ||
-                      orderQuantity >
-                        selectedSupplier.availableStock ||
-                      orderCreated
-                    }
-                    onClick={
-                      handleCreateSupplierOrder
-                    }
-                  >
-                    {orderCreated
-                      ? "Supplier Order Created"
-                      : "Create Supplier Order"}
-                  </Button>
                 </div>
-              )}
 
-              {orderCreated && (
-                <div
-                  className="supplier-order-success"
-                  role="status"
-                >
-                  <strong>
-                    Supplier order created successfully.
-                  </strong>
+                {allocatingError && (
+                  <div className="admin-procurement-error" style={{ marginBottom: "1rem" }}>
+                    {allocatingError}
+                  </div>
+                )}
 
-                  <span>
-                    The order has been routed to{" "}
-                    {
-                      selectedSupplier.supplierName
-                    }{" "}
-                    for fulfilment.
-                  </span>
-                </div>
-              )}
-            </>
-          )}
+                {isLoadingOffers ? (
+                  <div className="admin-procurement-loading">
+                    <Spinner size="large" />
+                    <p>Loading supplier offers...</p>
+                  </div>
+                ) : supplierOffers.length === 0 ? (
+                  <EmptyState
+                    title="No supplier offers"
+                    description="There are currently no supplier offers available for this product."
+                  />
+                ) : (
+                  <>
+                    <div className="supplier-comparison">
+                      {supplierOffers.map((supplier) => {
+                        const allocQty = allocations[supplier.id] || 0;
+                        return (
+                          <div key={supplier.id} className={`supplier-offer ${allocQty > 0 ? "supplier-offer-selected" : ""}`}>
+                            <div className="supplier-offer-top">
+                              <div>
+                                <h3>{supplier.supplierName}</h3>
+                                <span>★ {supplier.rating}</span>
+                              </div>
+                              <strong>
+                                {formatCurrency(supplier.price)}
+                                <small>/ unit</small>
+                              </strong>
+                            </div>
+
+                            <div className="supplier-offer-details">
+                              <div>
+                                <span>Available</span>
+                                <strong>{supplier.availableStock}</strong>
+                              </div>
+                              <div>
+                                <span>MOQ</span>
+                                <strong>{supplier.minimumOrderQuantity}</strong>
+                              </div>
+                              <div>
+                                <span>Delivery</span>
+                                <strong>{supplier.deliveryDays} days</strong>
+                              </div>
+                            </div>
+
+                            <div className="supplier-order-field" style={{ marginTop: "1rem" }}>
+                              <label htmlFor={`alloc-${supplier.id}`}>Allocated Quantity</label>
+                              <input
+                                id={`alloc-${supplier.id}`}
+                                type="number"
+                                min={0}
+                                max={supplier.availableStock}
+                                value={allocations[supplier.id] ?? 0}
+                                onChange={(e) => handleAllocationChange(supplier.id, e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="supplier-order-panel" style={{ marginTop: "1.5rem" }}>
+                      <div className="supplier-order-total">
+                        <span>Total Requested: <strong>{totalDemand}</strong></span>
+                        <span>Total Allocated: <strong>{totalAllocated}</strong></span>
+                      </div>
+
+                      <Button
+                        size="large"
+                        loading={isAllocating}
+                        disabled={orderCreated}
+                        onClick={handleConfirmAllocation}
+                      >
+                        {orderCreated ? "Allocation Confirmed" : "CONFIRM ALLOCATION"}
+                      </Button>
+                    </div>
+
+                    {orderCreated && (
+                      <div className="supplier-order-success" role="status" style={{ marginTop: "1rem" }}>
+                        <strong>Demand allocation created successfully.</strong>
+                        <span>The order requests have been routed to suppliers for confirmation.</span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            );
+          })()}
         </Card>
       )}
     </div>

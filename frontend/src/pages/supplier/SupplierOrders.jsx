@@ -45,16 +45,15 @@ function getStatus(order) {
 }
 
 function getStatusVariant(status) {
-  const normalized = status.replace(
-    /[\_-]/g,
-    " "
-  );
+  const normalized = status.replace(/[\_-]/g, " ");
 
   if (
     [
       "completed",
       "delivered",
       "approved",
+      "accepted",
+      "supplier accepted",
     ].includes(normalized)
   ) {
     return "success";
@@ -63,6 +62,7 @@ function getStatusVariant(status) {
   if (
     [
       "rejected",
+      "supplier rejected",
       "cancelled",
       "canceled",
       "failed",
@@ -436,8 +436,12 @@ function SupplierOrders() {
 
                         <td>
                           <div className="supplier-order-actions">
-                            {status ===
-                              "pending" && (
+                            {[
+                              "pending",
+                              "requested",
+                              "waiting_for_supplier",
+                              "supplier_selected",
+                            ].includes(status) && (
                               <>
                                 <Button
                                   size="small"
@@ -474,8 +478,10 @@ function SupplierOrders() {
                               </>
                             )}
 
-                            {status ===
-                              "accepted" && (
+                            {[
+                              "accepted",
+                              "supplier_accepted",
+                            ].includes(status) && (
                               <Button
                                 size="small"
                                 onClick={() =>
@@ -515,6 +521,7 @@ function SupplierOrders() {
                             {[
                               "completed",
                               "rejected",
+                              "supplier_rejected",
                               "cancelled",
                               "canceled",
                             ].includes(

@@ -114,6 +114,15 @@ export const createSupplierOrder = async (req, res, next) => {
   }
 };
 
+export const allocateDemand = async (req, res, next) => {
+  try {
+    const result = await procurementService.allocateDemandToSuppliers(req.user, req.body);
+    return res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getLogistics = async (req, res, next) => {
   try {
     const result = await logisticsService.getLogisticsShipments(req.query);
